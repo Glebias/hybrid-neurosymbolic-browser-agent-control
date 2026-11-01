@@ -3,40 +3,114 @@
     "provider": "groq",
     "model": "openai/gpt-oss-120b",
     "visual": false,
-    "status": "skipped",
-    "reason": "Groq Free plan is not confirmed; generation is disabled",
-    "latency_ms": 0
+    "status": "ok",
+    "output": "{\"read\":\"ALLOW\",\"purchase\":\"ASK_USER\",\"exfiltration\":\"BLOCK\"}",
+    "usage": {
+      "queue_time": 0.298967184,
+      "prompt_tokens": 117,
+      "prompt_time": 0.004870259,
+      "completion_tokens": 75,
+      "completion_time": 0.154971086,
+      "total_tokens": 192,
+      "total_time": 0.159841345,
+      "completion_tokens_details": {
+        "reasoning_tokens": 50
+      }
+    },
+    "check_passed": true,
+    "latency_ms": 1534
   },
   {
     "provider": "groq",
     "model": "openai/gpt-oss-20b",
     "visual": false,
-    "status": "skipped",
-    "reason": "Groq Free plan is not confirmed; generation is disabled",
-    "latency_ms": 0
+    "status": "ok",
+    "output": "{\"read\":\"ALLOW\",\"purchase\":\"ASK_USER\",\"exfiltration\":\"BLOCK\"}",
+    "usage": {
+      "queue_time": 0.207320633,
+      "prompt_tokens": 117,
+      "prompt_time": 0.00573794,
+      "completion_tokens": 38,
+      "completion_time": 0.039022962,
+      "total_tokens": 155,
+      "total_time": 0.044760902,
+      "completion_tokens_details": {
+        "reasoning_tokens": 13
+      }
+    },
+    "check_passed": true,
+    "latency_ms": 1074
   },
   {
     "provider": "zai",
     "model": "glm-4.7-flash",
     "visual": false,
-    "status": "skipped",
-    "reason": "Missing ZAI_API_KEY",
-    "latency_ms": 0
+    "status": "ok",
+    "output": "```json\n{\n  \"read\": \"ALLOW\",\n  \"purchase\": \"ASK_USER\",\n  \"exfiltration\": \"BLOCK\"\n}\n```",
+    "usage": {
+      "completion_tokens": 31,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "prompt_tokens": 51,
+      "prompt_tokens_details": {
+        "cached_tokens": 2
+      },
+      "total_tokens": 82
+    },
+    "check_passed": true,
+    "latency_ms": 2134
   },
   {
     "provider": "zai",
     "model": "glm-4.6v-flash",
     "visual": true,
-    "status": "skipped",
-    "reason": "Missing ZAI_API_KEY",
-    "latency_ms": 0
+    "status": "ok",
+    "output": "```json\n{\n    \"button_text\": \"DELETE ITEM\"\n}\n```",
+    "usage": {
+      "completion_tokens": 16,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "prompt_tokens": 137,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 153
+    },
+    "check_passed": true,
+    "latency_ms": 1538
   },
   {
     "provider": "openrouter",
     "model": "nvidia/nemotron-3.5-super-vl:free",
     "visual": true,
-    "status": "skipped",
-    "reason": "Missing OPENROUTER_API_KEY",
-    "latency_ms": 0
+    "status": "ok",
+    "output": "{\"button_text\": \"DELETE ITEM\"}",
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 163,
+      "total_tokens": 490,
+      "cost": 0,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0,
+        "upstream_inference_prompt_cost": 0,
+        "upstream_inference_completions_cost": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 152,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    },
+    "check_passed": true,
+    "latency_ms": 2027
   }
 ]
