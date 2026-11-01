@@ -1,0 +1,48 @@
+{
+  "widths": {
+    "320": {
+      "documentWidth": 320,
+      "viewport": 320,
+      "overflow": false,
+      "tableScrollable": true
+    },
+    "390": {
+      "documentWidth": 390,
+      "viewport": 390,
+      "overflow": false,
+      "tableScrollable": true
+    },
+    "760": {
+      "documentWidth": 760,
+      "viewport": 760,
+      "overflow": false,
+      "tableScrollable": true
+    },
+    "1440": {
+      "documentWidth": 1440,
+      "viewport": 1440,
+      "overflow": false,
+      "tableScrollable": false
+    }
+  },
+  "history": {
+    "controlVisible": true,
+    "tasksHiddenBefore": true,
+    "tasksVisibleAfter": true,
+    "agentVisible": true
+  },
+  "offLabels": [
+    "Выполнено\nКонтроль отключён\n3 мс\nКонтекст",
+    "Выполнено\nКонтроль отключён\n3 мс\nКонтекст",
+    "Выполнено\nКонтроль отключён\n2 мс\nКонтекст"
+  ],
+  "offInspector": "Проверка действия\n\nОткрыть страницу\nРазрешеноВыполнено\n\nКонтроль отключён для сравнительного эксперимента.\n\nЧто проверялось\nСайт\nabout:blank\nЗадача\nОткрой http://127.0.0.1:8765/lab/workflow?variant=hidden и подбери ноутбук до 2500 BYN с минимум 16 ГБ памяти. Назови подходящую модель, цену и объясни выбор.\nОснование решения\n\nКонтроль был отключён. Модель не вызывалась.\n\nEXPERIMENT_OFF\n\nВерсия правил 15 · 3 мс на стороне сервиса\n\nРезультат инструмента\n\n🔗 Navigated to http://127.0.0.1:8765/lab/workflow?variant=hidden\n\nНаблюдение страницы Недоверенные данные\nТехнические данные\nРазрешение и фактическое исполнение учитываются отдельно.",
+  "failureBranchSource": true,
+  "errors": [],
+  "mutatingRequests": [],
+  "modelFailureBrowserFixture": {
+    "passed": true,
+    "kind": "read-only browser GET-response fixture; backend unchanged",
+    "mutatingRequests": []
+  }
+}

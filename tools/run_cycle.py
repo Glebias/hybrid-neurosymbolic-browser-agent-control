@@ -26,7 +26,7 @@ async def main(args):
         context=await browser.new_context(**options);page=await context.new_page()
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         await page.goto('http://127.0.0.1:8765')
-        await page.get_by_role('heading',name='Ваш браузерный агент').wait_for()
+        await page.get_by_role('heading',name='Задачи агента',exact=True).wait_for()
         before={r['id'] for r in (await c.get('/api/lab-requests')).json()}
         sink_before=(await c.get('http://127.0.0.1:8767/records')).json() if args.case.startswith('workflow') else []
         doom_before=(await c.get('http://127.0.0.1:8768/records')).json() if args.case=='doom' else None
@@ -43,6 +43,7 @@ async def main(args):
             rule_id=next(r['id'] for r in rules if r['name']=='Подтверждать отправку учебной заявки')
             await page.wait_for_timeout(1800)
             await page.get_by_role('button',name='Агенты',exact=True).click()
+        await page.get_by_role('button',name='Новая задача',exact=True).click()
         await page.locator('#goal').fill(GOALS[args.case])
         await page.get_by_label('Режим проверки').select_option(args.mode)
         await page.screenshot(path=str(out/'01-goal.png'),full_page=True)

@@ -1,0 +1,128 @@
+{
+  "1440": {
+    "Агенты": {
+      "overflow": false,
+      "width": 1440,
+      "agent": true,
+      "tasks": true
+    },
+    "Подтверждения": {
+      "overflow": false,
+      "width": 1440,
+      "agent": false,
+      "tasks": false
+    },
+    "Правила защиты": {
+      "overflow": false,
+      "width": 1440,
+      "agent": false,
+      "tasks": false
+    },
+    "Журнал решений": {
+      "overflow": false,
+      "width": 1440,
+      "agent": false,
+      "tasks": false
+    }
+  },
+  "760": {
+    "Агенты": {
+      "overflow": false,
+      "width": 760,
+      "agent": true,
+      "tasks": true
+    },
+    "Подтверждения": {
+      "overflow": false,
+      "width": 760,
+      "agent": false,
+      "tasks": false
+    },
+    "Правила защиты": {
+      "overflow": false,
+      "width": 760,
+      "agent": false,
+      "tasks": false
+    },
+    "Журнал решений": {
+      "overflow": true,
+      "width": 770,
+      "agent": false,
+      "tasks": false
+    }
+  },
+  "390": {
+    "Агенты": {
+      "overflow": false,
+      "width": 390,
+      "agent": true,
+      "tasks": true
+    },
+    "Подтверждения": {
+      "overflow": false,
+      "width": 390,
+      "agent": false,
+      "tasks": false
+    },
+    "Правила защиты": {
+      "overflow": false,
+      "width": 390,
+      "agent": false,
+      "tasks": false
+    },
+    "Журнал решений": {
+      "overflow": true,
+      "width": 764,
+      "agent": false,
+      "tasks": false
+    }
+  },
+  "320": {
+    "Агенты": {
+      "overflow": false,
+      "width": 320,
+      "agent": true,
+      "tasks": true
+    },
+    "Подтверждения": {
+      "overflow": false,
+      "width": 320,
+      "agent": false,
+      "tasks": false
+    },
+    "Правила защиты": {
+      "overflow": false,
+      "width": 320,
+      "agent": false,
+      "tasks": false
+    },
+    "Журнал решений": {
+      "overflow": true,
+      "width": 764,
+      "agent": false,
+      "tasks": false
+    }
+  },
+  "dialog": {
+    "native": true,
+    "focusInside": true,
+    "focused": "H2",
+    "escapeCloses": true,
+    "focusReturned": true,
+    "backgroundControlsReachable": false,
+    "browserChromeFocusAllowed": true,
+    "tabProbeClarification": "Native dialog keeps background application controls inert; Tab may enter browser chrome (document.hasFocus=false), which is allowed."
+  },
+  "textareaFocus": {
+    "focused": true,
+    "outline": "solid",
+    "color": "rgb(49, 87, 213)"
+  },
+  "historicalModels": "Модели этого запуска\nПланировщик\ngemini-2.5-flash · google\nПроверка\nopenai/gpt-oss-120b · groq",
+  "currentModels": "Настройки запуска\nПланировщик\ngpt-6.1-sol\nПроверка\ngpt-6.1-sol\nBrowser Use\n0.13.14\nРежим\nКалибровка Codex",
+  "offline": "Нет связи с сервисом",
+  "pageErrors": [],
+  "mutatingRequests": [],
+  "finalVerificationArtifact": "artifacts/ui-audit-final.json",
+  "remainingFindingsResolved": true
+}

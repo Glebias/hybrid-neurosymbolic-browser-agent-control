@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "checks": [
+    "320px: all four views contained; agent and task selection reachable",
+    "390px: all four views contained; agent and task selection reachable",
+    "760px: all four views contained; agent and task selection reachable",
+    "1440px: all four views contained; agent and task selection reachable",
+    "native modal: focus enters, background inert, Escape closes, focus returns",
+    "task input has a visible keyboard focus indicator",
+    "journal filters by verdict and search; bounded page size and empty state",
+    "lost connection is visible and blocks task submission",
+    "fixture: pending approval submits once; ALLOW/approved are not shown as executed; expired request is closed",
+    "fixture: model failure is distinguished from a skipped model call",
+    "fixture: new-task composer sends one idempotent request, selects queued task, and closes"
+  ],
+  "page_errors": [],
+  "agent_tasks_started": 0,
+  "model_api_calls": 0,
+  "scope": "Live read-only history plus isolated UI request fixtures; not an autonomous-agent run"
+}
