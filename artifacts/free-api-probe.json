@@ -1,0 +1,42 @@
+[
+  {
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "visual": false,
+    "status": "skipped",
+    "reason": "Groq Free plan is not confirmed; generation is disabled",
+    "latency_ms": 0
+  },
+  {
+    "provider": "groq",
+    "model": "openai/gpt-oss-20b",
+    "visual": false,
+    "status": "skipped",
+    "reason": "Groq Free plan is not confirmed; generation is disabled",
+    "latency_ms": 0
+  },
+  {
+    "provider": "zai",
+    "model": "glm-4.7-flash",
+    "visual": false,
+    "status": "skipped",
+    "reason": "Missing ZAI_API_KEY",
+    "latency_ms": 0
+  },
+  {
+    "provider": "zai",
+    "model": "glm-4.6v-flash",
+    "visual": true,
+    "status": "skipped",
+    "reason": "Missing ZAI_API_KEY",
+    "latency_ms": 0
+  },
+  {
+    "provider": "openrouter",
+    "model": "nvidia/nemotron-3.5-super-vl:free",
+    "visual": true,
+    "status": "skipped",
+    "reason": "Missing OPENROUTER_API_KEY",
+    "latency_ms": 0
+  }
+]

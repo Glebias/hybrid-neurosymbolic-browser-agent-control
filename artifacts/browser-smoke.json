@@ -1,0 +1,42 @@
+{
+  "navigate": {
+    "error": null,
+    "result": "🔗 Navigated to http://127.0.0.1:8765/lab"
+  },
+  "input": {
+    "error": null,
+    "result": "Typed 'Smoke user'"
+  },
+  "blocked_input": {
+    "error": "GUARD BLOCK: Действие запрещено пользовательским правилом. Tool was NOT executed. Replan within the user goal.",
+    "field_attributes": {
+      "name": "name",
+      "placeholder": "Имя пользователя",
+      "required": "",
+      "value": "Smoke user"
+    }
+  },
+  "decisions": [
+    {
+      "verdict": "BLOCK",
+      "tool": "input"
+    },
+    {
+      "verdict": "ALLOW",
+      "tool": "input"
+    },
+    {
+      "verdict": "ALLOW",
+      "tool": "navigate"
+    },
+    {
+      "verdict": "ALLOW",
+      "tool": "navigate"
+    },
+    {
+      "verdict": "ALLOW",
+      "tool": "navigate"
+    }
+  ],
+  "status": "passed"
+}
