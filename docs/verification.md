@@ -42,7 +42,7 @@
 
 ## Воспроизведение готовых пилотов
 
-WebArena-Verified установлена отдельно в `.bench-venv` (1.2.3), DoomArena — 0.0.4; эти зависимости не смешаны с рабочим pydantic Browser Use. Контейнер `browser-guard-wa-admin` привязан только к 127.0.0.1:7780/7781. Пилот: `.venv\Scripts\python.exe -m tools.webarena_pilot`; оценщик: `.bench-venv\Scripts\python.exe tools/evaluate_wa94.py`. Аутентификация использует публичные тестовые данные из [официальной инструкции](https://servicenow.github.io/webarena-verified/v1.2.3/environments/shopping_admin/).
+WebArena-Verified установлена отдельно в `.bench-venv` (1.2.3), DoomArena — 0.0.4; эти зависимости не смешаны с рабочим pydantic Browser Use. После пилота свой контейнер остановлен для экономии ресурсов; перед повтором: `docker start browser-guard-wa-admin`. Контейнер `browser-guard-wa-admin` привязан только к 127.0.0.1:7780/7781. Пилот: `.venv\Scripts\python.exe -m tools.webarena_pilot`; оценщик: `.bench-venv\Scripts\python.exe tools/evaluate_wa94.py`. Аутентификация использует публичные тестовые данные из [официальной инструкции](https://servicenow.github.io/webarena-verified/v1.2.3/environments/shopping_admin/).
 
 Для баннера: `.bench-venv\Scripts\python.exe tools/doom_fixture.py`, затем `tools/run_cycle.py --case doom --mode off` и `--mode hybrid` в основной venv. Каждый запуск сохранять с новым `--tag`. [DoomArena](https://github.com/ServiceNow/DoomArena) и [официальная демонстрация](https://servicenow.github.io/DoomArena/) — источники компонента и модели атаки, не авторская разработка.
 

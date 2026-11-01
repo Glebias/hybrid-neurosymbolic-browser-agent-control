@@ -1,0 +1,17 @@
+{
+  "pdf": "C:\\Users\\Глеб\\OneDrive\\Desktop\\БГУИР\\сем7\\02_Курсовая_работа\\ТиИСПИС\\Проект\\Пояснительная записка — 2-я опроцентовка.pdf",
+  "pages": 30,
+  "section2_printed_pages": [
+    17,
+    28
+  ],
+  "section2_pages": 12,
+  "approved_figures": 8,
+  "sources": 11,
+  "unresolved_references": 0,
+  "overfull_boxes": 0,
+  "uppercase_body_line_starts_without_indent": 0,
+  "template_fonts_colors_margins": "unchanged",
+  "visual_review": "Section 2 rendered and reviewed; bibliography fits one page; title/contents preserved",
+  "sha256": "cf2b456314ff31be2f94de54a615906a413475526e9de42363aa724daa8bab2d"
+}
