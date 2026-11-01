@@ -11,12 +11,13 @@ class SVG:
         self.parts=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">',
           '<style>text{font-family:"Times New Roman",serif;font-size:23px;fill:#000}.label{paint-order:stroke;stroke:#fff;stroke-width:5;stroke-linejoin:round}.head{font-size:27px;font-weight:bold}.small{font-size:20px}.line{fill:none;stroke:#000;stroke-width:2}</style>',
           '<defs><marker id="filled" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#000"/></marker><marker id="open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#000" stroke-width="1.5"/></marker></defs>',f'<rect width="{w}" height="{h}" fill="#fff"/>']
-        self.text(w/2,35,title,'head')
+        # The report supplies the figure caption; keep a non-rendered accessible title only.
+        self.parts.append(f'<title>{html.escape(title)}</title>')
     def text(self,x,y,text,cls='',anchor='middle'):
         lines=text.split('\n')
         for i,line in enumerate(lines):self.parts.append(f'<text class="{cls}" x="{x}" y="{y+i*27}" text-anchor="{anchor}">{html.escape(line)}</text>')
-    def rect(self,x,y,w,h,label='',dash=False):
-        self.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#fff" stroke="#000" stroke-width="2"'+(' stroke-dasharray="9 7"' if dash else '')+'/>')
+    def rect(self,x,y,w,h,label='',dash=False,fill='#fff'):
+        self.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}" stroke="#000" stroke-width="2"'+(' stroke-dasharray="9 7"' if dash else '')+'/>')
         if label:self.text(x+w/2,y+h/2-13*(len(label.split('\n'))-1)+8,label)
     def path(self,d,arrow=False,dashed=False,open=False):
         self.parts.append(f'<path class="line" d="{d}"'+(' stroke-dasharray="8 6"' if dashed else '')+(f' marker-end="url(#{"open" if open else "filled"})"' if arrow else '')+'/>')
@@ -59,7 +60,7 @@ def generate(out):
     s.rect(545,525,190,75,'Смысловой\nанализ');s.rect(790,525,190,75,'Символьный\nрешатель');s.path('M885 370 V490 H640 V525',True);s.path('M735 565 H790',True)
     s.rect(545,805,190,75,'Внешняя\nмодель');s.rect(790,665,190,70,'Правила\nи журнал');s.path('M640 600 V805',True);s.path('M640 805 V600',True);s.path('M885 600 V665',True);s.path('M885 665 V600',True)
     s.path('M980 565 H1005 V330 H980',True)
-    s.text(525,922,'Сервис не исполняет браузерный инструмент самостоятельно','small');s.save(out/'02_общая_архитектура.svg')
+    s.save(out/'02_общая_архитектура.svg')
 
     s=SVG(1050,960,'Проверка действия до исполнения')
     a,b,c,d,e,f=s.participants(['Агент','Адаптер','Сервис','Модель','Решатель','Инструмент'])
@@ -80,7 +81,7 @@ def generate(out):
     s.path('M545 875 H680',True);s.text(610,860,'нет','label small');s.rect(680,845,260,60,'BLOCK')
     s.path('M350 925 V970',True);s.text(375,950,'да','small');s.rect(140,970,420,85,'Применение приоритетов\nк фактам и правилам')
     s.path('M350 1055 V1110',True);s.ellipse(350,1150,260,42,'ALLOW / ASK_USER / BLOCK')
-    s.text(500,1240,'Неизвестный эффект не считается доказанно безопасным','small');s.save(out/'05_алгоритм_решения.svg')
+    s.save(out/'05_алгоритм_решения.svg')
 
     s=SVG(1050,820,'Логическая модель данных')
     boxes=[('Агент',['agent_id, тип','состояние, профиль']),('Профиль',['profile_id, версия','режим подтверждений']),('Правило',['rule_id, версия','условие, приоритет, исход']),('Задача',['task_id, agent_id','цель, статус, результат']),('Действие',['proposal_id, task_id','инструмент, контекст']),('Смысловая оценка',['эффект, полномочия','свидетельство, риск']),('Подтверждение',['decision_id, срок','ответ, время ответа']),('Решение',['decision_id, proposal_id','исход, причина, задержка']),('Событие',['seq, task_id, decision_id?','время, вид, результат'])]
@@ -90,7 +91,7 @@ def generate(out):
     for y,left,right in [(180,'N:1','N:M'),(415,'1:N','1:0..1'),(650,'0..1:1','1:0..N')]:
         s.path(f'M315 {y} H380 M670 {y} H735');s.text(345,y-10,left,'small');s.text(705,y-10,right,'small')
     s.path('M170 260 V335 M525 495 V570');s.text(187,305,'1:N','small');s.text(542,541,'1:N','small')
-    s.text(525,800,'Оценка и подтверждение могут храниться внутри записи решения','small');s.save(out/'06_модель_данных.svg')
+    s.save(out/'06_модель_данных.svg')
 
     s=SVG(1000,930,'Подключение Browser Use к защитному слою')
     s.rect(250,80,500,75,'Задача пользователя из панели');s.path('M500 155 V205',True)
@@ -105,7 +106,7 @@ def generate(out):
     s=SVG(1050,1120,'Подтверждение и ограниченный срок ожидания')
     a,b,c,d,e,f=s.participants(['Агент','Адаптер','Сервис','Панель','Человек','Инструмент'])
     for x1,x2,y,label,reply in [(a,b,190,'действие',False),(b,c,260,'проверить',False),(c,b,330,'ASK_USER',True),(d,c,400,'ожидающие',False),(c,d,470,'запрос',True),(e,d,540,'ответ',False),(d,c,610,'согласие / отказ',False),(b,c,680,'получить ответ',False),(c,b,750,'исход',True)]:s.message(x1,x2,y,label,reply)
-    s.rect(25,790,1000,270);s.text(40,818,'alt: согласие и актуальный контекст','small','start')
+    s.rect(25,790,1000,270,fill='none');s.text(40,818,'alt: согласие и актуальный контекст','small','start')
     s.message(b,f,865,'исполнить');s.message(f,b,925,'результат',True)
     s.path('M25 955 H1025',dashed=True);s.text(40,983,'else: отказ, истечение срока или изменение контекста','small','start');s.message(b,a,1030,'отказ без исполнения',True)
     s.save(out/'22_ожидание_подтверждения_и_тайм_аут.svg')
