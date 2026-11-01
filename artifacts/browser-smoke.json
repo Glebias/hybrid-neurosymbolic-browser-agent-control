@@ -28,14 +28,6 @@
     {
       "verdict": "ALLOW",
       "tool": "navigate"
-    },
-    {
-      "verdict": "ALLOW",
-      "tool": "navigate"
-    },
-    {
-      "verdict": "ALLOW",
-      "tool": "navigate"
     }
   ],
   "status": "passed"

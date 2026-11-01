@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "rules": [
+    {"id":"CONTROL_PLANE","stage":"pre","priority":0,"when":{"field":"control_plane","op":"eq","value":true},"verdict":"BLOCK","reason":"Агенту запрещён доступ к управлению собственной защитой."},
+    {"id":"P0","stage":"pre","priority":1,"when":{"field":"supported","op":"eq","value":false},"verdict":"BLOCK","reason":"Неподдерживаемый или непрозрачный инструмент."},
+    {"id":"CONTEXT_MISSING","stage":"pre","priority":2,"when":{"field":"context_available","op":"eq","value":false},"verdict":"BLOCK","reason":"Не удалось получить актуальный контекст действия."},
+    {"id":"P1","stage":"pre","priority":3,"when":{"field":"secret","op":"eq","value":true},"verdict":"BLOCK","reason":"Предложена передача данных, отмеченных как секретные."},
+    {"id":"P7_FAST","stage":"pre","priority":90,"when":{"field":"fast_observation","op":"eq","value":true},"verdict":"ALLOW","reason":"Проверенный инструмент наблюдения или завершения задачи."},
+    {"id":"P2","stage":"post","priority":4,"when":{"field":"verified_injection_effect","op":"eq","value":true},"verdict":"BLOCK","reason":"Наблюдается инструкция страницы, перенаправляющая действие агента."},
+    {"id":"P2_GOAL","stage":"post","priority":5,"when":{"field":"alignment","op":"in","value":["conflicts","unrelated"]},"verdict":"BLOCK","reason":"Действие противоречит задаче пользователя или не относится к ней."},
+    {"id":"P2_AUTH","stage":"post","priority":5,"when":{"field":"authorization","op":"eq","value":"forbidden"},"verdict":"BLOCK","reason":"Последствия действия прямо запрещены пользователем."},
+    {"id":"P4","stage":"post","priority":6,"when":{"field":"uncertain","op":"eq","value":true},"verdict":"BLOCK","reason":"После уточнения контекста последствия действия не установлены; исполнение остановлено."},
+    {"id":"P5_P6","stage":"post","priority":41,"when":{"all":[{"field":"effect","op":"in","value":["purchase","delete","auth","send"]},{"field":"authorization","op":"not_in","value":["explicit","forbidden"]}]},"verdict":"ASK_USER","reason":"Значимое действие связано с задачей, но границы разрешения пользователя неоднозначны."},
+    {"id":"P9_STRICT","stage":"post","priority":42,"when":{"all":[{"field":"strict","op":"eq","value":true},{"field":"effect","op":"in","value":["write","input"]}]},"verdict":"ASK_USER","reason":"Строгий профиль требует подтверждения изменения данных."},
+    {"id":"P7_P9","stage":"post","priority":90,"when":{"all":[{"field":"alignment","op":"eq","value":"aligned"},{"field":"uncertain","op":"eq","value":false}]},"verdict":"ALLOW","reason":"Действие соответствует задаче и допустимому классу последствий."}
+  ]
+}

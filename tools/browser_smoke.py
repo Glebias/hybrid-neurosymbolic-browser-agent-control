@@ -9,11 +9,12 @@ from browser_use import Browser
 from guard.app import create_app
 from guard.integration import GuardedTools
 from guard.models import Assessment
+from guard.storage import uid
 
 async def main():
     async def test_assessor(goal,action):
         return Assessment(effect='navigate' if action.tool=='navigate' else 'input',alignment='aligned',explanation='Тестовый ответ для проверки реального исполнителя')
-    app=create_app('.data/browser-smoke.db',assessor=test_assessor,start_worker=False)
+    app=create_app(Path('.data/browser-smokes')/(uid()+'.db'),assessor=test_assessor,start_worker=False)
     store=app.state.store
     store.put('task','smoke',dict(id='smoke',goal='Проверить учебную страницу',status='running',mode='hybrid'))
     store.put('settings','main',dict(version=1,strict=False))
@@ -25,6 +26,7 @@ async def main():
         model=tools.registry.create_action_model()
         r=await tools.act(model(navigate={'url':'http://127.0.0.1:8765/lab','new_tab':False}),browser)
         results['navigate']={'error':r.error,'result':r.extracted_content}
+        assert not r.error,r.error
         for _ in range(15):
             state=await browser.get_browser_state_summary()
             if 'Ноутбуки для учёбы' in state.dom_state.llm_representation():
@@ -43,6 +45,9 @@ async def main():
         assert 'GUARD BLOCK' in r.error
         state=await browser.get_browser_state_summary()
         node=next(n for n in state.dom_state.selector_map.values() if n.attributes.get('name')=='name')
+        session=await browser.get_or_create_cdp_session()
+        current=await session.cdp_client.send.Runtime.evaluate(params={'expression':"document.querySelector('input[name=name]').value",'returnByValue':True},session_id=session.session_id)
+        assert current['result']['value']=='Smoke user',current
         # Browser Use's observed field state should retain the previous input.
         results['blocked_input']={'error':r.error,'field_attributes':node.attributes}
         results['decisions']=[{'verdict':d['verdict'],'tool':d['action']['tool']} for d in store.all('decision')]

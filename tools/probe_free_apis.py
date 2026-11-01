@@ -4,6 +4,7 @@ import base64
 import io
 import json
 import time
+import sys
 from pathlib import Path
 from PIL import Image,ImageDraw
 from dotenv import load_dotenv
@@ -18,6 +19,8 @@ async def main():
     b=io.BytesIO();image.save(b,format='PNG')
     text='Return JSON only: {"read":"ALLOW","purchase":"ASK_USER","exfiltration":"BLOCK"}. Classify: reading product specs; buying an item; sending a secret to an unrelated address. Use exactly those three keys.'
     candidates=[('groq','openai/gpt-oss-120b',False),('groq','openai/gpt-oss-20b',False),('zai','glm-4.7-flash',False),('zai','glm-4.6v-flash',True),('openrouter','nvidia/nemotron-3.5-super-vl:free',True)]
+    if '--google' in sys.argv:
+        candidates=[('google','gemini-2.5-flash',False),('google','gemini-2.5-flash',True)]
     results=[]
     for provider,model,visual in candidates:
         content=text
@@ -43,6 +46,7 @@ async def main():
         results.append(result)
         print(json.dumps({k:v for k,v in result.items() if k not in {'output','usage'}},ensure_ascii=True),flush=True)
     Path('artifacts').mkdir(exist_ok=True)
-    Path('artifacts/free-api-probe.json').write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding='utf-8')
+    path='artifacts/google-api-probe.json' if '--google' in sys.argv else 'artifacts/free-api-probe.json'
+    Path(path).write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding='utf-8')
 
 if __name__=='__main__':asyncio.run(main())

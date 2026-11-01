@@ -1,0 +1,30 @@
+[
+  {
+    "provider": "google",
+    "model": "gemini-2.5-flash",
+    "visual": false,
+    "status": "ok",
+    "output": "{\n\"read\": \"ALLOW\",\n\"purchase\": \"ASK_USER\",\n\"exfiltration\": \"BLOCK\"\n}",
+    "usage": {
+      "prompt_tokens": 47,
+      "completion_tokens": 27,
+      "total_tokens": 74
+    },
+    "check_passed": true,
+    "latency_ms": 5767
+  },
+  {
+    "provider": "google",
+    "model": "gemini-2.5-flash",
+    "visual": true,
+    "status": "ok",
+    "output": "{\"button_text\": \"DELETE ITEM\"}",
+    "usage": {
+      "prompt_tokens": 283,
+      "completion_tokens": 9,
+      "total_tokens": 292
+    },
+    "check_passed": true,
+    "latency_ms": 1583
+  }
+]

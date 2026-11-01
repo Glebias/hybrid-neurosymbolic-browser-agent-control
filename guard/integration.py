@@ -7,6 +7,8 @@ import asyncio
 import json
 import os
 import time
+import re
+from urllib.parse import urljoin, urlparse
 from uuid import uuid4
 import httpx
 from browser_use import Tools, ActionResult
@@ -19,7 +21,7 @@ class GuardedTools(Tools):
     def __init__(self, task_id, base_url=None, transport=None):
         super().__init__(exclude_actions=EXCLUDED)
         self.task_id = task_id
-        self.client = httpx.AsyncClient(base_url=base_url or os.getenv('GUARD_URL','http://127.0.0.1:8765'),timeout=65,transport=transport)
+        self.client = httpx.AsyncClient(base_url=base_url or os.getenv('GUARD_URL','http://127.0.0.1:8765'),timeout=200,transport=transport,trust_env=False)
         self.recent = []
 
     async def close_client(self):
@@ -42,6 +44,28 @@ class GuardedTools(Tools):
                             break
                         if p.node_name.lower() == 'form':
                             target['form']={'attributes':p.attributes,'text':p.get_all_children_text(max_depth=5)[:2500]}
+                            # A submit button can override its parent form's destination.
+                            destination=urljoin(state.url,node.attributes.get('formaction') or p.attributes.get('action','') or state.url)
+                            fields=[]
+                            def visit(n,depth=0):
+                                if depth>8:return
+                                attrs=getattr(n,'attributes',{})
+                                if getattr(n,'node_name','').lower() in {'input','textarea','select'}:
+                                    name=attrs.get('name','')
+                                    sensitive=bool(re.search(r'(token|secret|password|api.?key|cookie)',name,re.I))
+                                    field={'name':name,'type':attrs.get('type','text'),'sensitive':sensitive}
+                                    value=attrs.get('value','')
+                                    # Small primitive query parameters help distinguish a filter from an unexplained transfer.
+                                    # Never copy secret, free-text or high-entropy hidden values into the model context.
+                                    if not sensitive and (re.fullmatch(r'-?\d{1,7}(?:\.\d{1,6})?',value) or value.lower() in {'true','false'}):
+                                        field['value']=value
+                                    fields.append(field)
+                                for child in getattr(n,'children_nodes',None) or []:visit(child,depth+1)
+                            visit(p)
+                            target['form'].update(destination=destination,fields=fields)
+                            source_url,dest_url=urlparse(state.url),urlparse(destination)
+                            foreign=(source_url.scheme,source_url.netloc)!=(dest_url.scheme,dest_url.netloc)
+                            target['cross_origin_secret_form']=foreign and any(f['sensitive'] for f in fields)
                             break
                         p = p.parent_node
                 else:
@@ -58,6 +82,21 @@ class GuardedTools(Tools):
         r.raise_for_status()
 
     async def act(self, action, browser_session, **kwargs):
+        started=time.perf_counter();timing={'human_wait_ms':0,'execution_ms':0}
+        try:
+            return await self._guarded_act(action,browser_session,timing,**kwargs)
+        finally:
+            if timing.get('wait_started'):
+                timing['human_wait_ms']+=(time.perf_counter()-timing.pop('wait_started'))*1000
+            timing['guard_overhead_ms']=round((time.perf_counter()-started)*1000-timing['human_wait_ms']-timing['execution_ms'],2)
+            timing['human_wait_ms']=round(timing['human_wait_ms'],2)
+            timing['execution_ms']=round(timing['execution_ms'],2)
+            try:
+                await self.record('guard_timing',timing)
+            except Exception:
+                pass
+
+    async def _guarded_act(self, action, browser_session, timing, **kwargs):
         entries = [(k,v) for k,v in action.model_dump(exclude_unset=True).items() if v is not None]
         if len(entries) != 1:
             return ActionResult(error='GUARD BLOCK P0: expected one atomic tool call')
@@ -65,17 +104,20 @@ class GuardedTools(Tools):
         params = params or {}
         observation = await self.observe(browser_session,params)
         description = getattr(self.registry.registry.actions.get(tool),'description','')
-        secret = observation.target.get('attributes',{}).get('type') == 'password'
+        secret = observation.target.get('attributes',{}).get('type') == 'password' or observation.target.get('cross_origin_secret_form',False)
         proposal = Action(proposal_id=uuid4().hex,task_id=self.task_id,tool=tool,arguments=params,description=description,
                           observation=observation,recent_actions=self.recent[-5:],payload_class='secret' if secret else 'ordinary')
         try:
             r = await self.client.post('/api/decide',json=proposal.model_dump())
             r.raise_for_status()
             decision = r.json()
+            timing['decision_id']=decision['decision_id']
             if decision['verdict'] == 'ASK_USER':
+                timing['wait_started']=time.perf_counter()
                 while True:
                     if time.time() >= decision['expires_at']:
                         await self.record('confirmation_expired',{'decision_id':decision['decision_id']})
+                        await self.client.post(f'/api/tasks/{self.task_id}/proposals/{proposal.proposal_id}/cancel')
                         return ActionResult(error='GUARD BLOCK: confirmation expired. Tool was NOT executed.')
                     await asyncio.sleep(.5)
                     r = await self.client.get('/api/decisions/'+decision['decision_id'])
@@ -85,6 +127,7 @@ class GuardedTools(Tools):
                         if not current['approval']:
                             return ActionResult(error='GUARD BLOCK: user rejected this action. Tool was NOT executed.')
                         break
+                timing['human_wait_ms']=(time.perf_counter()-timing.pop('wait_started'))*1000
             elif decision['verdict'] != 'ALLOW':
                 self.recent.append({'tool':tool,'status':'blocked','reason':decision['reason']})
                 return ActionResult(error='GUARD BLOCK: '+decision['reason']+' Tool was NOT executed. Replan within the user goal.')
@@ -97,16 +140,28 @@ class GuardedTools(Tools):
             status_r.raise_for_status()
             if status_r.json()['settings']['version'] != decision['policy_version']:
                 return ActionResult(error='GUARD BLOCK: policy changed. Propose the action again.')
+            if status_r.json().get('base_policy_hash') != decision.get('base_policy_hash'):
+                return ActionResult(error='GUARD BLOCK: base policy changed. Propose again.')
             if tool not in {'done','wait'}:
                 fresh = await self.observe(browser_session,params,fresh=True)
                 if not observation.fingerprint or fresh.fingerprint != observation.fingerprint:
                     await self.record('stale_context',{'decision_id':decision['decision_id']})
                     return ActionResult(error='GUARD BLOCK: page or target changed during review. Observe and propose again.')
+        except asyncio.CancelledError:
+            try:
+                await asyncio.wait_for(asyncio.shield(self.client.post(f'/api/tasks/{self.task_id}/proposals/{proposal.proposal_id}/cancel')),timeout=3)
+            except Exception:
+                pass
+            raise
         except (httpx.HTTPError,KeyError,ValueError):
             return ActionResult(error='GUARD_UNAVAILABLE: safety service failed. Tool was NOT executed.')
         # Waiting for a human happens outside the original per-tool timeout.
         # The Agent step timeout is separately configured above confirmation + model budget.
-        result = await super().act(action,browser_session,**kwargs)
+        execution_start=time.perf_counter()
+        try:
+            result = await super().act(action,browser_session,**kwargs)
+        finally:
+            timing['execution_ms']=(time.perf_counter()-execution_start)*1000
         self.recent.append({'tool':tool,'status':'error' if result.error else 'executed','summary':(result.error or result.extracted_content or '')[:1000]})
         try:
             await self.record('execution_result',{'decision_id':decision['decision_id'],'tool':tool,'success':not bool(result.error),

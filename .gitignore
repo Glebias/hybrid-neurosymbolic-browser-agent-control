@@ -1,4 +1,5 @@
 .venv/
+.bench-venv/
 .env
 .data/
 __pycache__/
@@ -7,4 +8,11 @@ node_modules/
 frontend/dist/
 artifacts/raw/
 artifacts/report-preview/
+artifacts/runs/
+artifacts/webarena-*-retrieve.json
+artifacts/video/part*.mp4
+artifacts/video/frame-*.png
+artifacts/video/final-*.png
+artifacts/video/caption*.txt
+artifacts/video/concat.txt
 *.log

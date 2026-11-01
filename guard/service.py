@@ -23,6 +23,12 @@ def visible_action(action):
     d = action.model_dump()
     if action.payload_class == 'secret':
         d['arguments'] = {'redacted':'секретное содержимое скрыто'}
+        # Secret values may also be reflected in the DOM, URL or previous tool output.
+        # Keep only structural metadata in the persistent journal.
+        target=d['observation']['target']
+        d['observation'].update(url='[скрыт для секретного действия]',title='',page_excerpt='',
+            target={k:v for k,v in target.items() if k in {'tag','backend_node_id','cross_origin_secret_form'}})
+        d['recent_actions']=[]
     # Screenshots are local evidence, not repeated in each event.
     d['observation'].pop('screenshot',None)
     return d
@@ -38,6 +44,8 @@ class GuardService:
             task = self.store.get('task',action.task_id)
             if not task or task['status'] not in {'running','waiting'}:
                 raise ValueError('Задача не активна')
+            if self.store.get('cancelled_proposal',action.proposal_id):
+                raise ValueError('Предложение отменено')
             old = self.store.get('proposal',action.proposal_id)
             fingerprint = action_digest(action)
             if old:
@@ -49,7 +57,7 @@ class GuardService:
             rules = self.store.all('rule')
             mode = task.get('mode','hybrid')
             facts, skipped = None, True
-            pre = policy.initial(action,rules)
+            pre = policy.initial(action,rules if mode!='neural' else [])
             if mode == 'off':
                 answer = ('ALLOW','Контроль отключён для сравнительного эксперимента.', ['EXPERIMENT_OFF'])
             elif pre and (mode != 'neural' or pre[0] == 'BLOCK'):
@@ -67,9 +75,11 @@ class GuardService:
                         # Explicit failure does not fall back to permissive rules.
                         return self._save(action,task,fingerprint,answer,None,skipped,start,settings)
                 if mode == 'neural' and facts:
-                    if facts.alignment in {'conflicts','unrelated'} or facts.injection_suspected:
+                    if facts.alignment in {'conflicts','unrelated'} or facts.injection_suspected or facts.authorization=='forbidden':
                         answer = ('BLOCK',facts.explanation,['NEURAL'])
-                    elif facts.uncertain or facts.effect in {'purchase','delete','send','auth','unknown'}:
+                    elif facts.uncertain or facts.effect=='unknown':
+                        answer = ('BLOCK',facts.explanation,['NEURAL'])
+                    elif facts.effect in {'purchase','delete','send','auth'} and facts.authorization!='explicit':
                         answer = ('ASK_USER',facts.explanation,['NEURAL'])
                     else:
                         answer = ('ALLOW',facts.explanation,['NEURAL'])
@@ -78,11 +88,21 @@ class GuardService:
             return self._save(action,task,fingerprint,answer,facts,skipped,start,settings)
 
     def _save(self,action,task,fingerprint,answer,facts,skipped,start,settings):
+        latest=self.store.get('task',action.task_id)
+        cancelled=self.store.get('cancelled_proposal',action.proposal_id)
+        if not latest or latest['status'] not in {'running','waiting'} or cancelled:
+            answer=('BLOCK','Предложение отменено или задача уже не активна.', ['PROPOSAL_CANCELLED'])
+        task=latest or task
         verdict, reason, rule_ids = answer
         d = Decision(decision_id=uid(),proposal_id=action.proposal_id,verdict=verdict,reason=reason,rule_ids=rule_ids,
                      assessment=facts,model_skipped=skipped,latency_ms=round((time.perf_counter()-start)*1000,2),
                      policy_version=settings.get('version',1),expires_at=time.time()+int(os.getenv('CONFIRMATION_TIMEOUT','120')) if verdict=='ASK_USER' else None).model_dump()
         d.update(task_id=action.task_id,action=visible_action(action),action_hash=fingerprint,created_at=time.time(),approval=None)
+        from .model_runtime import route
+        d['model_provider'],d['model_name']=route('guard')
+        d['run_kind']='calibration' if route('guard')[0]=='codex' else 'api-control'
+        d['analysis_runs']=facts._analysis_runs if facts else []
+        d['base_policy_hash']=policy.catalog_hash()
         d['has_screenshot']=False
         if action.observation.screenshot and action.payload_class != 'secret':
             try:
@@ -102,9 +122,22 @@ class GuardService:
             self.store.put('task',task['id'],task)
         return d
 
+    def cancel_proposal(self,task_id,proposal_id):
+        cancelled={'task_id':task_id,'proposal_id':proposal_id,'at':time.time()}
+        self.store.put('cancelled_proposal',proposal_id,cancelled)
+        proposal=self.store.get('proposal',proposal_id)
+        if proposal and proposal['task_id']==task_id:
+            d=self.store.get('decision',proposal['decision_id'])
+            d['cancelled_at']=cancelled['at'];self.store.put('decision',d['decision_id'],d)
+            self.store.event(task_id,'proposal_cancelled',{'decision_id':d['decision_id']})
+            task=self.store.get('task',task_id)
+            if task and task['status']=='waiting':
+                task['status']='running';self.store.put('task',task_id,task)
+        return {'ok':True}
+
     def approval(self,id,allow):
         d = self.store.get('decision',id)
-        if not d or d['verdict'] != 'ASK_USER' or d['approval'] is not None:
+        if not d or d['verdict'] != 'ASK_USER' or d['approval'] is not None or d.get('cancelled_at'):
             raise ValueError('Запрос подтверждения отсутствует или уже обработан')
         task = self.store.get('task',d['task_id'])
         if time.time() > d['expires_at'] or task['status'] not in {'running','waiting'}:

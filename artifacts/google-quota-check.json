@@ -1,0 +1,14 @@
+{
+  "provider": "google",
+  "model": "gemini-2.5-flash",
+  "http_status": 429,
+  "checked_at": 1793572175.383882,
+  "limits": [
+    {
+      "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+      "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+      "quotaValue": "20"
+    }
+  ],
+  "retry_delay": "34223s"
+}

@@ -5,7 +5,7 @@
     "rule created through UI and persisted",
     "rule survives reload and can be removed",
     "profile toggles through API",
-    "empty approvals and journal display correctly",
+    "approvals and populated journal display correctly",
     "responsive layout has no horizontal overflow"
   ],
   "page_errors": [],

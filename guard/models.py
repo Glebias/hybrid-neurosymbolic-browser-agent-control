@@ -1,5 +1,5 @@
 from typing import Literal, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 Verdict = Literal['ALLOW', 'ASK_USER', 'BLOCK']
 
@@ -29,6 +29,9 @@ class Assessment(BaseModel):
     evidence: str = ''
     explanation: str
     uncertain: bool = False
+    authorization: Literal['explicit','implicit','unclear','forbidden'] = 'unclear'
+    authorization_evidence: str = ''
+    _analysis_runs: list[dict] = PrivateAttr(default_factory=list)
 
 class Decision(BaseModel):
     decision_id: str
