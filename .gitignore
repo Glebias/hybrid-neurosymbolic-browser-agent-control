@@ -1,6 +1,11 @@
 .venv/
 .bench-venv/
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
 .data/
 __pycache__/
 .pytest_cache/
@@ -9,6 +14,7 @@ frontend/dist/
 artifacts/raw/
 artifacts/report-preview/
 artifacts/runs/
+artifacts/vpn-retry.json
 artifacts/webarena-*-retrieve.json
 artifacts/video/part*.mp4
 artifacts/video/frame-*.png
