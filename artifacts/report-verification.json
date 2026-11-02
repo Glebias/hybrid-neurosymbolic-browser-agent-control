@@ -13,8 +13,9 @@
   "uppercase_body_line_starts_without_indent": 0,
   "template_fonts_colors_margins": "unchanged",
   "visual_review": "Section 2 rendered and reviewed; bibliography fits one page; title/contents preserved",
-  "sha256": "eea34b81ea30302006b2f95d5262f6c05f3389500ea17a77d548b7f46457a0cd",
+  "sha256": "d360afee8a0a03fdc45ae305016eeb5d06bcfddb6bb6dd207b1135a4420c9a39",
   "visible_internal_diagram_titles": false,
   "external_diagram_notes": false,
-  "sequence_alt_frame": "transparent; lifelines and messages visible"
+  "sequence_alt_frame": "transparent; lifelines and messages visible",
+  "introduction_page4_fix": "Joined object and subject into one sentence; lower-case subject at continuation; printed page 4 visually reviewed, 30 physical pages retained."
 }
