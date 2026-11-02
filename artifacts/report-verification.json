@@ -13,9 +13,10 @@
   "uppercase_body_line_starts_without_indent": 0,
   "template_fonts_colors_margins": "unchanged",
   "visual_review": "Section 2 rendered and reviewed; bibliography fits one page; title/contents preserved",
-  "sha256": "d360afee8a0a03fdc45ae305016eeb5d06bcfddb6bb6dd207b1135a4420c9a39",
+  "sha256": "cd1e3ec330b443c72f4db266a6f4ccc0a9eb07d346adbd0bb708235994338152",
   "visible_internal_diagram_titles": false,
   "external_diagram_notes": false,
   "sequence_alt_frame": "transparent; lifelines and messages visible",
-  "introduction_page4_fix": "Joined object and subject into one sentence; lower-case subject at continuation; printed page 4 visually reviewed, 30 physical pages retained."
+  "introduction_page4_fix": "Joined object and subject into one sentence; lower-case subject at continuation; printed page 4 visually reviewed, 30 physical pages retained.",
+  "line_start_check": "Poppler bbox text decoded from Latin-1 glyph mapping to Windows-1251; checked physical pages 4-29, xMin 84-87 pt; excluded table caption, headings and bibliography; printed pages 12 and 16 visually reviewed."
 }
